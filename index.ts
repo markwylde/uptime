@@ -1,11 +1,5 @@
 import { loadEnv } from './src/envloader.ts';
-
-// Load environment variables from .env file if it exists
-loadEnv();
-
-// Initialize logger (must be after loadEnv to read LOG_FILE from .env)
-import './src/logger.ts';
-
+import { initLogger } from './src/logger.ts';
 import { loadConfig, getConfig, onConfigChange, type Config, type UrlConfig } from './src/config.ts';
 import { checkUrl } from './src/checker.ts';
 import { notifyDown, notifyUp, notifySslExpiring } from './src/notify.ts';
@@ -169,6 +163,12 @@ function sleep(ms: number): Promise<void> {
 }
 
 function main(): void {
+  // Load environment variables from .env file if it exists
+  loadEnv();
+
+  // Initialize logger (must be after loadEnv to read NODE_LOG_FILE from .env)
+  initLogger();
+
   const configPath = process.argv[2] || 'config.yaml';
 
   console.log('[uptime] Starting uptime monitor...');
