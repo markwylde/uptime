@@ -5,13 +5,19 @@
   "type": "module",
   "main": "index.ts",
   "scripts": {
-    "start": "node --experimental-strip-types --env-file-if-exists=.env --watch index.ts",
-    "start:config": "node --experimental-strip-types index.ts config.yaml"
+    "dev": "node --experimental-strip-types --env-file-if-exists=.env --watch index.ts",
+    "start": "node --env-file-if-exists=.env --watch dist/js/index.js",
+    "build": "tsc"
   },
   "engines": {
     "node": ">=24.0.0"
   },
   "dependencies": {
     "nodemailer": "^7.0.11"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "@types/nodemailer": "^7.0.4",
+    "typescript": "^5.7.2"
   }
 }
