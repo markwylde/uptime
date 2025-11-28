@@ -1,0 +1,17 @@
+{
+  "name": "uptime-monitor",
+  "version": "1.0.0",
+  "description": "Zero-dependency uptime monitor",
+  "type": "module",
+  "main": "index.ts",
+  "scripts": {
+    "start": "node --experimental-strip-types --env-file-if-exists=.env --watch index.ts",
+    "start:config": "node --experimental-strip-types index.ts config.yaml"
+  },
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "dependencies": {
+    "nodemailer": "^7.0.11"
+  }
+}

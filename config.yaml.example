@@ -1,0 +1,42 @@
+# Global settings
+settings:
+  default_timeout: 30  # seconds
+  user_agent: "Uptime-Monitor/1.0"
+  follow_redirects: true
+  max_redirects: 5
+
+# Notification channels
+notifications:
+  email:
+    - your-email@example.com
+
+# Alert settings
+alerts:
+  retry_count: 3  # Check N times before alerting
+  retry_delay: 10  # seconds between retries
+  alert_on_recovery: true
+  cooldown_period: 300  # seconds before re-alerting
+
+urls:
+  - name: Example Website
+    category: Example
+    url: https://example.com
+    delay: 60  # seconds
+    method: GET
+    timeout: 15  # seconds
+    expected_status: [200, 301, 302]
+    expected_content: "Example Domain"  # Optional: keyword to check in response
+    response_time_threshold: 2000  # ms - alert if slower
+    check_ssl: true
+
+# Data storage settings
+storage:
+  path: ./data.json
+  retention_days: 5  # How many days of history to keep
+
+# Status page settings
+status_page:
+  enabled: true
+  public: true
+  title: "Status Monitor"
+  incident_retention_days: 90
