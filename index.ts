@@ -1,4 +1,11 @@
 import { loadEnv } from './src/envloader.ts';
+
+// Load environment variables from .env file if it exists
+loadEnv();
+
+// Initialize logger (must be after loadEnv to read LOG_FILE from .env)
+import './src/logger.ts';
+
 import { loadConfig, getConfig, onConfigChange, type Config, type UrlConfig } from './src/config.ts';
 import { checkUrl } from './src/checker.ts';
 import { notifyDown, notifyUp, notifySslExpiring } from './src/notify.ts';
@@ -11,9 +18,6 @@ import {
   resolveIncident,
   setRetentionHours,
 } from './src/status-page.ts';
-
-// Load environment variables from .env file if it exists
-loadEnv();
 
 interface UrlState {
   status: 'up' | 'down';
