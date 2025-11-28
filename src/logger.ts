@@ -1,16 +1,16 @@
 import pino from 'pino';
 import { createWriteStream } from 'fs';
 
-const logFile = process.env.LOG_FILE;
+const logFile = process.env.NODE_LOG_FILE;
 
 // Create the Pino logger instance
 const logger = pino(
   {
-    level: process.env.LOG_LEVEL || 'info',
+    level: process.env.NODE_LOG_LEVEL || 'info',
     timestamp: pino.stdTimeFunctions.isoTime,
   },
   logFile
-    ? // Write to file when LOG_FILE is set
+    ? // Write to file when NODE_LOG_FILE is set
       createWriteStream(logFile, { flags: 'a' })
     : // Use pretty printing for stdout when no file is set
       pino.transport({
@@ -22,6 +22,13 @@ const logger = pino(
         },
       })
 );
+
+// Log that we've initialized
+if (logFile) {
+  logger.info(`Logger initialized - writing to file: ${logFile}`);
+} else {
+  logger.info('Logger initialized - writing to stdout');
+}
 
 // Intercept console methods and redirect through Pino
 const originalConsole = {
