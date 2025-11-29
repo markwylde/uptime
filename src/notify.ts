@@ -2,27 +2,32 @@ import nodemailer from 'nodemailer';
 import type { UrlConfig } from './config.ts';
 import type { CheckResult, SslInfo } from './types.ts';
 
-const SMTP_ENABLED = process.env.SMTP_ENABLED === 'true';
-const SMTP_HOST = process.env.SMTP_HOST || 'localhost';
-const SMTP_PORT = parseInt(process.env.SMTP_PORT || '587', 10);
-const SMTP_TLS = process.env.SMTP_TLS === 'true';
-const SMTP_USER = process.env.SMTP_USER || '';
-const SMTP_PASSWORD = process.env.SMTP_PASSWORD || '';
-const SMTP_FROM_NAME = process.env.SMTP_FROM_NAME || '';
-const SMTP_FROM_ADDRESS = process.env.SMTP_FROM_ADDRESS || 'uptime@localhost';
-
 let transporter: nodemailer.Transporter | null = null;
 
+function getSmtpConfig() {
+  return {
+    enabled: process.env.SMTP_ENABLED === 'true',
+    host: process.env.SMTP_HOST || 'localhost',
+    port: parseInt(process.env.SMTP_PORT || '587', 10),
+    tls: process.env.SMTP_TLS === 'true',
+    user: process.env.SMTP_USER || '',
+    password: process.env.SMTP_PASSWORD || '',
+    fromName: process.env.SMTP_FROM_NAME || '',
+    fromAddress: process.env.SMTP_FROM_ADDRESS || 'uptime@localhost',
+  };
+}
+
 function getTransporter(): nodemailer.Transporter {
+  const config = getSmtpConfig();
   if (!transporter) {
     transporter = nodemailer.createTransport({
-      host: SMTP_HOST,
-      port: SMTP_PORT,
-      secure: SMTP_PORT === 465,
-      requireTLS: SMTP_TLS,
-      auth: SMTP_USER && SMTP_PASSWORD ? {
-        user: SMTP_USER,
-        pass: SMTP_PASSWORD,
+      host: config.host,
+      port: config.port,
+      secure: config.port === 465,
+      requireTLS: config.tls,
+      auth: config.user && config.password ? {
+        user: config.user,
+        pass: config.password,
       } : undefined,
     });
   }
@@ -30,7 +35,8 @@ function getTransporter(): nodemailer.Transporter {
 }
 
 export async function sendEmail(to: string, subject: string, body: string): Promise<void> {
-  if (!SMTP_ENABLED || !SMTP_HOST || SMTP_HOST === 'localhost') {
+  const config = getSmtpConfig();
+  if (!config.enabled || !config.host || config.host === 'localhost') {
     console.log('[notify] SMTP not configured, logging email instead:');
     console.log(`  To: ${to}`);
     console.log(`  Subject: ${subject}`);
@@ -39,9 +45,9 @@ export async function sendEmail(to: string, subject: string, body: string): Prom
   }
 
   try {
-    const fromAddress = SMTP_FROM_NAME
-      ? `"${SMTP_FROM_NAME}" <${SMTP_FROM_ADDRESS}>`
-      : SMTP_FROM_ADDRESS;
+    const fromAddress = config.fromName
+      ? `"${config.fromName}" <${config.fromAddress}>`
+      : config.fromAddress;
 
     await getTransporter().sendMail({
       from: fromAddress,
