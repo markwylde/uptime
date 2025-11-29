@@ -1,3 +1,4 @@
+import { writeFileSync } from 'fs';
 import { loadEnv } from './src/envloader.ts';
 import { initLogger } from './src/logger.ts';
 import { loadConfig, getConfig, onConfigChange, type Config, type UrlConfig } from './src/config.ts';
