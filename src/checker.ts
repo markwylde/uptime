@@ -74,10 +74,20 @@ export async function checkUrl(urlConfig: UrlConfig, globalSettings: SettingsCon
     result.success = true;
   } catch (err) {
     result.responseTime = Date.now() - startTime;
-    result.error = (err as Error).message;
+    result.error = describeError(err);
   }
 
   return result;
+}
+
+// Node reports a failed connect to every address of a host as an AggregateError
+// with an empty message; the reasons are in `errors`.
+function describeError(err: unknown): string {
+  const e = err as Error & { code?: string; errors?: (Error & { code?: string; address?: string })[] };
+  if (e.errors?.length) {
+    return e.errors.map((sub) => sub.address ? `${sub.address}: ${sub.code || sub.message}` : sub.code || sub.message).join('; ');
+  }
+  return e.message || e.code || String(err);
 }
 
 function makeRequest(urlString: string, options: RequestOptions, redirectCount = 0): Promise<HttpResponse> {
@@ -92,6 +102,9 @@ function makeRequest(urlString: string, options: RequestOptions, redirectCount =
       path: url.pathname + url.search,
       method: options.method,
       timeout: options.timeout,
+      // Connects from the hosting box fail for minutes at a time with an empty
+      // error; check over IPv4 only.
+      family: 4,
       headers: {
         'User-Agent': options.userAgent,
       },
